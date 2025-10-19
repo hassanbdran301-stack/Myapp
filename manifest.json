@@ -1,0 +1,22 @@
+{
+  "name": "إدارة المصروف والمخزون",
+  "short_name": "المصروف",
+  "description": "تطبيق بسيط يساعدك على إدارة المصروفات والمخزون ومتابعة أرباحك اليومية بسهولة.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://hassan-badran.com/wp-content/uploads/2025/10/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://hassan-badran.com/wp-content/uploads/2025/10/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
