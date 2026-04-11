@@ -12,6 +12,22 @@ import { useAuth } from '../contexts/AuthContext'
 import { formatCurrency } from '../utils/installmentUtils'
 import PaymentModal from '../components/PaymentModal'
 
+const DEMO_DEBT = {
+  id: 'demo-debt',
+  debtorId: 'demo-debtor',
+  creditorId: 'demo-creditor',
+  totalAmount: 3000,
+  installmentAmount: 1000,
+  remainingAmount: 2800,
+  status: 'active',
+  createdAt: new Date().toISOString(),
+  installments: [
+    { id: 1, dueAmount: 1000, paidAmount: 200, status: 'awaiting_confirmation', paymentDate: new Date().toISOString(), isExtra: false, signature: null },
+    { id: 2, dueAmount: 1000, paidAmount: 0, status: 'pending', paymentDate: null, isExtra: false, signature: null },
+    { id: 3, dueAmount: 800,  paidAmount: 0, status: 'pending', paymentDate: null, isExtra: true,  signature: null },
+  ],
+}
+
 function AnimatedAmount({ value }) {
   const [display, setDisplay] = useState(value)
   const prevRef = useRef(value)
@@ -65,12 +81,17 @@ const STATUS_COLOR = {
 }
 
 export default function DebtorDashboard() {
-  const { currentUser, userData, logout } = useAuth()
+  const { currentUser, userData, logout, demoMode } = useAuth()
   const [debt, setDebt] = useState(null)
   const [loading, setLoading] = useState(true)
   const [payingIndex, setPayingIndex] = useState(null)
 
   async function fetchDebt() {
+    if (demoMode) {
+      setDebt(DEMO_DEBT)
+      setLoading(false)
+      return
+    }
     const q = query(
       collection(db, 'debts'),
       where('debtorId', '==', currentUser.uid),
@@ -101,9 +122,9 @@ export default function DebtorDashboard() {
       return inst
     })
 
-    await updateDoc(doc(db, 'debts', debt.id), {
-      installments: newInstallments,
-    })
+    if (!demoMode) {
+      await updateDoc(doc(db, 'debts', debt.id), { installments: newInstallments })
+    }
     setDebt((prev) => ({ ...prev, installments: newInstallments }))
     setPayingIndex(null)
   }

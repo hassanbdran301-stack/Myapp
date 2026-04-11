@@ -14,18 +14,39 @@ import { recalculateAfterPayment, formatCurrency } from '../utils/installmentUti
 import SignatureModal from '../components/SignatureModal'
 
 export default function CreditorDashboard() {
-  const { currentUser, userData, logout } = useAuth()
+  const { currentUser, userData, logout, demoMode } = useAuth()
   const [debts, setDebts] = useState([])
   const [loading, setLoading] = useState(true)
-  const [signingTarget, setSigningTarget] = useState(null) // { debtId, index, debtorName }
-  const [tab, setTab] = useState(0) // 0 = pending, 1 = confirmed
+  const [signingTarget, setSigningTarget] = useState(null)
+  const [tab, setTab] = useState(0)
+
+  const DEMO_DEBTS = [{
+    id: 'demo-debt',
+    debtorId: 'demo-debtor',
+    creditorId: 'demo-creditor',
+    totalAmount: 3000,
+    installmentAmount: 1000,
+    remainingAmount: 2800,
+    status: 'active',
+    debtorName: 'أحمد محمد',
+    installments: [
+      { id: 1, dueAmount: 1000, paidAmount: 200, status: 'awaiting_confirmation', paymentDate: new Date().toISOString(), isExtra: false, signature: null },
+      { id: 2, dueAmount: 1000, paidAmount: 0,   status: 'pending',               paymentDate: null, isExtra: false, signature: null },
+      { id: 3, dueAmount: 800,  paidAmount: 0,   status: 'pending',               paymentDate: null, isExtra: true,  signature: null },
+    ],
+  }]
 
   async function fetchDebts() {
+    if (demoMode) {
+      setDebts(DEMO_DEBTS)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     const q = query(collection(db, 'debts'), where('creditorId', '==', currentUser.uid))
     const snap = await getDocs(q)
 
-    const results = await Promise.all(
+    const results = await Promise.all( // eslint-disable-line
       snap.docs.map(async (d) => {
         const data = d.data()
         let debtorName = 'غير معروف'
@@ -45,6 +66,17 @@ export default function CreditorDashboard() {
   }, [currentUser.uid])
 
   async function handleConfirm(debtId, installmentIndex, paidAmount, signature) {
+    if (demoMode) {
+      setDebts((prev) => prev.map((d) => {
+        if (d.id !== debtId) return d
+        const newInst = d.installments.map((inst, i) =>
+          i === installmentIndex ? { ...inst, status: 'confirmed', signature, confirmedAt: new Date().toISOString() } : inst
+        )
+        return { ...d, installments: newInst }
+      }))
+      setSigningTarget(null)
+      return
+    }
     const debtRef = doc(db, 'debts', debtId)
     const debtSnap = await getDoc(debtRef)
     const debt = debtSnap.data()
