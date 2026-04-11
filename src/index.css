@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: 'Tajawal', 'Segoe UI', sans-serif;
+}
+
+body {
+  direction: rtl;
+  background-color: #f1f5f9;
+}
+
+@layer utilities {
+  .debt-pulse {
+    animation: debtPulse 0.6s ease-out;
+  }
+}
+
+@keyframes debtPulse {
+  0% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.signature-canvas {
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  cursor: crosshair;
+  background: #f8fafc;
+}
