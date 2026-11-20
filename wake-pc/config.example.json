@@ -1,0 +1,10 @@
+{
+  "name": "كمبيوتر البيت",
+  "mac": "AA:BB:CC:DD:EE:FF",
+  "pc_ip": "192.168.1.50",
+  "broadcast": "255.255.255.255",
+  "wol_port": 9,
+  "password": "غير-هذه-الكلمة",
+  "listen_host": "0.0.0.0",
+  "listen_port": 8080
+}
